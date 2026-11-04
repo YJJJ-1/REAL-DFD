@@ -1,0 +1,162 @@
+# Reproduction of logs/training/asym_multi_vggface2 with confidence auxiliary real disabled.
+og_dir: ./logs/benchv2/asym_training
+logdir: ./logs
+model_name: asym_multi
+backbone_name: vit
+pretrained: /data2/Mining/active_learning/clip-model/
+backbone_config:
+  mode: original
+  num_classes: 2
+  inc: 3
+  dropout: false
+feat_dim: 1024
+num_real_prototypes: 8
+center_momentum: 0.99
+var_momentum: 0.99
+lambda2: 1.0
+lambda4: 0.05
+lambda_reg: 0.0005
+lambda_real_metric: 1.0
+lambda_fake_metric: 3.0
+fake_topk: 3
+real_assign_temp: 0.5
+lambda_metric: 1.0
+lambda_center_div: 1.0
+lambda_balance: 0.2
+lambda_intra: 0.05
+margin: -0.2
+logit_scale: 16.0
+center_balance_temp: 0.1
+pos_weight: 2.5
+alpha: 0.0
+alpha_mode: fixed
+alpha_min: 0.0
+alpha_max: 1.0
+distance_scale: 1.0
+mahalanobis_eps: 1.0e-06
+unpaired_real_dir: /data2/Mining/real-candidates/
+all_dataset:
+- FaceForensics++
+- FF-F2F
+- FF-DF
+- FF-FS
+- FF-NT
+- FaceShifter
+- DeepFakeDetection
+- Celeb-DF-v1
+- Celeb-DF-v2
+- DFDCP
+- DFDC
+- DeeperForensics-1.0
+- UADFV
+- WDF
+train_dataset:
+- FaceForensics++
+test_dataset:
+- Celeb-DF-v1
+- Celeb-DF-v2
+- DFDC
+- DFDCP
+- FaceForensics++
+- UADFV
+- WDF
+compression: c23
+train_batchSize: 4
+unpaired_batch_size: 16
+test_batchSize: 32
+workers: 0
+frame_num:
+  train: 8
+  test: 8
+resolution: 224
+with_mask: false
+with_landmark: false
+use_data_augmentation: true
+data_aug:
+  flip_prob: 0.5
+  rotate_prob: 0.5
+  rotate_limit:
+  - -10
+  - 10
+  blur_prob: 0.5
+  blur_limit:
+  - 3
+  - 7
+  brightness_prob: 0.5
+  brightness_limit:
+  - -0.1
+  - 0.1
+  contrast_limit:
+  - -0.1
+  - 0.1
+  quality_lower: 40
+  quality_upper: 100
+mean:
+- 0.48145466
+- 0.4578275
+- 0.40821073
+std:
+- 0.26862954
+- 0.26130258
+- 0.27577711
+optimizer:
+  type: adam
+  adam:
+    lr: 5.0e-05
+    beta1: 0.9
+    beta2: 0.999
+    eps: 1.0e-08
+    weight_decay: 0.0005
+    amsgrad: false
+  sgd:
+    lr: 5.0e-05
+    momentum: 0.9
+    weight_decay: 0.0005
+lr_scheduler: cosine
+lr_T_max: 8
+lr_eta_min: 1.0e-06
+nEpochs: 8
+start_epoch: 0
+save_epoch: 1
+rec_iter: 100
+manualSeed: 1024
+save_ckpt: true
+save_feat: false
+save_dataset_results: false
+loss_func: cross_entropy
+losstype: null
+metric_scoring: auc
+cuda: true
+cudnn: true
+use_unpaired_real: true
+use_unpaired_real_for_confidence: false
+use_unpaired_real_for_manifold: true
+use_real_pull: true
+use_center_div: true
+use_center_balance: true
+use_intra_loss: true
+use_fake_repel: true
+use_patch_repel: true
+use_local_similarity_dropout: false
+use_boundary_mining: true
+use_hard_fake_weighting: true
+detach_centers_for_fake: true
+use_dynamic_margin: true
+margin_start: -0.2
+margin_end: -0.6
+margin_start_epoch: 4.0
+margin_end_epoch: 8.0
+steps_per_epoch: 1439
+use_fake_weight_warmup: true
+fake_warmup_epoch: 3.0
+local_dropout_prob: 0.0
+real_mid_dist_low: 0.2
+real_mid_dist_high: 0.5
+real_mid_weight: 3.0
+real_extreme_weight: 0.0
+fake_mid_threshold_low: 0.1
+fake_mid_threshold_high: 0.8
+fake_mid_weight: 5.0
+fake_extreme_weight: 0.0
+use_distance_fusion: false
+balance_real_fake: true
