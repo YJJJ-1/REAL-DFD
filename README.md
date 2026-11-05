@@ -1,19 +1,19 @@
-# asym_multi 复现包
+# asym_multi
 
-本包按 DeepfakeBench 的 `training/` 结构仅保留 asym_multi 所需的入口、registry、数据集、检测器、训练器、指标代码及 YAML，使用 `/data2/Mining/logs/training/asym_multi_vggface2/training.log` 的实际参数。相对原实验，按要求将 `use_unpaired_real_for_confidence` 改为 `false`、训练 batch size 改为 4、unpaired batch size 改为 16、测试集缩减为 7 个。这会得到新的权重和指标，不能把旧权重的测试结果当成新实验结果。
+This package follows the DeepfakeBench `training/` directory structure and includes only the entry points, registry, datasets, detectors, trainer, metrics code, and YAML files required for asym_multi. It uses the actual parameters recorded in `/data2/Mining/logs/training/asym_multi_vggface2/training.log`. Compared with the original experiment, the following changes have been made as requested: `use_unpaired_real_for_confidence` is set to `false`, the training batch size is set to 4, the unpaired batch size is set to 16, and the number of test datasets is reduced to 7. These changes will produce new model weights and evaluation metrics. Results obtained using the old weights must not be presented as results from the new experiment.
 
-## 外部数据与环境
+## External Data and Environment
 
-包内不包含其他检测方法的代码、数据集、数据集 JSON、VGGFace2 辅助图像、CLIP 预训练模型、旧 checkpoint 或任何结果文件。使用本机 `/data2/Mining` 已有资源：
+The package does not include code for other detection methods, datasets, dataset JSON files, auxiliary VGGFace2 images, pretrained CLIP models, old checkpoints, or any result files. It uses resources already available under `/data2/Mining` on the local machine:
 
 - `/data2/Mining/datasets/`
 - `/data2/Mining/preprocessing/dataset_json/`
-- `/data2/Mining/real-candidates/`（其中的 VGGFace2 预处理图像）
+- `/data2/Mining/real-candidates/` (contains preprocessed VGGFace2 images)
 - `/data2/Mining/active_learning/clip-model/`
 
-请在已有的 DeepfakeBench Python 环境中运行。包内 `training/config/train_config.yaml` 和 `test_config.yaml` 已将数据及日志目录改为绝对路径；换机器时需调整这两个文件和 detector YAML 中的 `pretrained`、`unpaired_real_dir`。
+Run the package in an existing DeepfakeBench Python environment. The paths for data and logs in `training/config/train_config.yaml` and `test_config.yaml` have been set to absolute paths. When running on another machine, update these two files as well as the `pretrained` and `unpaired_real_dir` settings in the detector YAML file.
 
-## 解压与训练
+## Extraction and Training
 
 ```bash
 cd /data2/Mining/analysis
@@ -22,21 +22,21 @@ cd asym_multi
 bash run_train.sh
 ```
 
-可用 `CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash run_train.sh` 指定 8 张卡。脚本使用 `torchrun --nproc_per_node=8`。当前配置为 FF++ c23 训练、训练/测试各 8/32 帧、训练 batch size 4、unpaired batch size 16、测试 batch size 32、种子 1024。
+To specify eight GPUs, use `CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash run_train.sh`. The script uses `torchrun --nproc_per_node=8`. The current configuration trains on FF++ c23, uses 8/32 frames for training/testing respectively, a training batch size of 4, an unpaired batch size of 16, a test batch size of 32, and a random seed of 1024.
 
-新运行日志位于 `/data2/Mining/logs/training/asym_multi_YYYY-MM-DD-HH-MM-SS/`。仅保存训练日志、训练 TensorBoard 和平均 AUC 最佳权重。
+Logs for a new run are stored in `/data2/Mining/logs/training/asym_multi_YYYY-MM-DD-HH-MM-SS/`. Only the training logs, training TensorBoard logs, and checkpoint with the best average AUC are saved.
 
-## 仅用最佳权重测试
+## Testing with the Best Checkpoint Only
 
-将下面路径换成实际新运行目录。该命令不训练，只加载 `test/avg/ckpt_best.pth`，并且仅在终端打印指标：
+Replace the path below with the directory of the actual new run. This command does not perform training; it only loads `test/avg/ckpt_best.pth` and prints evaluation metrics to the terminal:
 
 ```bash
 cd /data2/Mining/analysis/asym_multi
 bash run_test.sh /data2/Mining/logs/training/asym_multi_YYYY-MM-DD-HH-MM-SS/test/avg/ckpt_best.pth
 ```
 
-测试 YAML 列出的 Celeb-DF-v1、Celeb-DF-v2、DFDC、DFDCP、FaceForensics++、UADFV、WDF 这 7 个数据集。只测 FF++ 可在权重路径后加 `FaceForensics++`。测试参数 `--no-save-results` 不写分数和汇总 CSV，`--config-loader` 使用 YAML 中的 batch size 32、workers 0。若想测试旧实验权重，可把路径换成 `/data2/Mining/logs/training/asym_multi_vggface2/test/avg/ckpt_best.pth`，但它不代表本次重新训练的结果。
+Evaluation covers the seven datasets listed in the test YAML file: Celeb-DF-v1, Celeb-DF-v2, DFDC, DFDCP, FaceForensics++, UADFV, and WDF. To evaluate only on FF++, append `FaceForensics++` after the checkpoint path. The `--no-save-results` argument prevents saving prediction scores and summary CSV files, while `--config-loader` uses the batch size of 32 and 0 workers specified in the YAML file. To evaluate the checkpoint from the previous experiment, replace the path with `/data2/Mining/logs/training/asym_multi_vggface2/test/avg/ckpt_best.pth`. However, those results do not represent the newly retrained model.
 
-## 包内结构
+## Package Structure
 
-`training/detectors/` 只有 `asym_multi_detector.py` 和基类；`training/dataset/` 只有基础数据集及图像变换；`training/networks/` 只有 registry 接口（ViT 由检测器调用本地 CLIP）。
+`training/detectors/` contains only `asym_multi_detector.py` and the base detector class; `training/dataset/` contains only the base dataset and image transformations; `training/networks/` contains only the registry interface (the detector loads the local CLIP model for the ViT backbone).
