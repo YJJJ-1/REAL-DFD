@@ -1,15 +1,15 @@
 # asym_multi
 
-This package follows the DeepfakeBench `training/` directory structure and includes only the entry points, registry, datasets, detectors, trainer, metrics code, and YAML files required for asym_multi. It uses the actual parameters recorded in `/data2/Mining/logs/training/asym_multi_vggface2/training.log`.
+This package follows the DeepfakeBench `training/` directory structure and includes only the entry points, registry, datasets, detectors, trainer, metrics code, and YAML files required for asym_multi.
 
 ## External Data and Environment
 
 The package does not include code for other detection methods, datasets, dataset JSON files, auxiliary VGGFace2 images, pretrained CLIP models. 
 
-- `/data2/Mining/datasets/`
-- `/data2/Mining/preprocessing/dataset_json/`
-- `/data2/Mining/real-candidates/` (contains preprocessed VGGFace2 images)
-- `/data2/Mining/active_learning/clip-model/`
+- `./datasets/`
+- `./preprocessing/dataset_json/`
+- `./real-candidates/` (contains preprocessed VGGFace2 images)
+- `./active_learning/clip-model/`
 
 Run the package in an existing DeepfakeBench Python environment. The paths for data and logs in `training/config/train_config.yaml` and `test_config.yaml` have been set to absolute paths. When running on another machine, update these two files as well as the `pretrained` and `unpaired_real_dir` settings in the detector YAML file.
 
